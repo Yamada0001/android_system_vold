@@ -30,7 +30,9 @@
 
 #include <android/hardware/weaver/1.0/IWeaver.h>
 #include <aidl/android/hardware/weaver/IWeaver.h>
-#include "Utils.h"
+#include <android-base/macros.h>
+#include <cstddef>
+#include <vector>
 
 namespace android {
 namespace vold {
@@ -47,7 +49,7 @@ class Weaver {
 		bool GetKeySize(uint32_t* keySize);
 		bool GetValueSize(uint32_t* valueSize);
 		// TODO: we should return more information about the status including time delays before the next retry
-		bool WeaverVerify(const uint32_t slot, const void* weaver_key, std::vector<uint8_t>* payload);
+		bool WeaverVerify(const uint32_t slot, const void* weaver_key, size_t key_buffer_size, std::vector<uint8_t>* payload);
 
 	private:
 		sp<hardware::weaver::V1_0::IWeaver> mDevice;
