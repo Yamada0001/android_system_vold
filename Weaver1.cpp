@@ -52,8 +52,16 @@ namespace vold {
 
 Weaver::Weaver() {
     const std::string instance = std::string(::aidl::android::hardware::weaver::IWeaver::descriptor) + "/default";
-    AIBinder* binder = AServiceManager_waitForService(instance.c_str());
-    mAidlDevice = ::aidl::android::hardware::weaver::IWeaver::fromBinder(ndk::SpAIBinder(binder));
+    // Recovery starts the HALs after mounting the stock vendor stack. Bound
+    // retries avoid probing before the AIDL service has registered while
+    // still allowing recovery to fall back to the legacy HIDL implementation.
+    for (int attempt = 0; attempt < 50 && mAidlDevice == nullptr; ++attempt) {
+        AIBinder* binder = AServiceManager_checkService(instance.c_str());
+        if (binder != nullptr)
+            mAidlDevice = ::aidl::android::hardware::weaver::IWeaver::fromBinder(ndk::SpAIBinder(binder));
+        if (mAidlDevice == nullptr)
+            usleep(100000);
+    }
 	if (mAidlDevice == nullptr) {
 		mDevice = ::android::hardware::weaver::V1_0::IWeaver::getService();
 	}
