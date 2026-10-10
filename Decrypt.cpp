@@ -18,6 +18,7 @@
 #include "SyntheticPasswordFormat.h"
 #include "SyntheticPasswordCrypto.h"
 #include "FsCrypt.h"
+#include "Utils.h"
 #include <fscrypt/fscrypt.h>
 
 #include <map>
